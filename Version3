@@ -1,1 +1,157 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include<stdlib.h>
 
+// 结构体
+struct Node{
+    char data[100];    // 内容串
+    char type[20];     // 类型串
+    struct Node *next;
+};
+void toLower(char *s){
+    int i;
+    for(i=0; s[i]!='\0'; i++){
+        s[i] = tolower(s[i]);
+    }
+}
+
+int main(){
+    //=====F3：数组+串实现搜索历史【核心】=====
+    #define MAX_HIST 30
+    // 二维数组：每行存放一个关键词字符串(串)
+    char historyStr[MAX_HIST][100];
+    int count = 0; // 历史条数，数组有效元素个数
+
+    char f1List[][100] = {
+        "F1 红牛车队",     "车队",
+        "F1 法拉利车队",   "车队",
+        "F1 梅赛德斯车队", "车队",
+        "F1 赛车速度",     "赛事",
+        "F1 维斯塔潘",     "车手",
+        "F1 汉密尔顿",     "车手",
+        "F1 勒克莱尔",     "车手",
+        "F1 赛道记录",     "赛事"
+    };
+    int n = 8;
+    char key[100];
+    char keyLower[100];
+
+    struct Node *head = NULL;
+    struct Node *tail = NULL;
+    struct Node *filterHead = NULL;
+    struct Node *filterTail = NULL;
+
+    printf("请输入 F1 搜索关键词：");
+    gets(key);
+    // 串复制：把输入的关键词串存入历史数组
+    if(count < MAX_HIST){
+        strcpy(historyStr[count], key); // 串赋值操作
+        count++;
+    }
+
+    strcpy(keyLower, key);
+    toLower(keyLower);
+
+    int i;
+    //F1关键词搜索
+    for(i=0; i<n; i++){
+        char temp[100];
+        strcpy(temp, f1List[i*2]);
+        toLower(temp);
+
+        if(strstr(temp, keyLower) != NULL){
+            struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+            strcpy(newNode->data, f1List[i*2]);
+            strcpy(newNode->type, f1List[i*2 + 1]);
+            newNode->next = NULL;
+
+            if(head == NULL){
+                head = newNode;
+                tail = newNode;
+            }else{
+                tail->next = newNode;
+                tail = newNode;
+            }
+        }
+    }
+
+    //输出F1搜索结果
+    printf("\n===== 搜索结果 =====\n");
+    struct Node *p = head;
+    if(p == NULL){
+        printf("未找到相关 F1 信息\n");
+        return 0;
+    }else{
+        while(p != NULL){
+            printf("[%s] %s\n", p->type, p->data);
+            p = p->next;
+        }
+    }
+
+    //F2按类型筛选
+    printf("\n===== F2 结果筛选：按类型筛选 =====\n");
+    printf("可选类型：车队 / 车手 / 赛事\n");
+    printf("请输入要筛选的类型：");
+    char filterType[20];
+    gets(filterType);
+
+    p = head;
+    while(p != NULL){
+        if(strcmp(p->type, filterType) == 0){
+            struct Node *fNode = (struct Node*)malloc(sizeof(struct Node));
+            strcpy(fNode->data, p->data);
+            strcpy(fNode->type, p->type);
+            fNode->next = NULL;
+
+            if(filterHead == NULL){
+                filterHead = fNode;
+                filterTail = fNode;
+            }else{
+                filterTail->next = fNode;
+                filterTail = fNode;
+            }
+        }
+        p = p->next;
+    }
+
+    //输出筛选结果
+    printf("\n===== 筛选结果 =====\n");
+    struct Node *f = filterHead;
+    if(f == NULL){
+        printf("该类型下无结果\n");
+    }else{
+        while(f != NULL){
+            printf("[%s] %s\n", f->type, f->data);
+            f = f->next;
+        }
+    }
+
+    //=====F3功能：遍历数组，输出所有历史字符串（串操作+数组遍历）=====
+    printf("\n======== F3 搜索历史记录（数组+串实现）========\n");
+    if(count == 0){
+        printf("暂无搜索历史串\n");
+    }else{
+        //数组循环，逐个取出字符串输出
+        for(i = 0; i < count; i++){
+            printf("第%d次搜索：%s\n", i+1, historyStr[i]);
+        }
+    }
+
+    //释放链表内存
+    struct Node *del;
+    p = head;
+    while(p != NULL){
+        del = p;
+        p = p->next;
+        free(del);
+    }
+    f = filterHead;
+    while(f != NULL){
+        del = f;
+        f = f->next;
+        free(del);
+    }
+
+    return 0;
+}
