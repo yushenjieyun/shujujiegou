@@ -1,1 +1,38 @@
+    //=====================【F4：历史关键词二次搜索】=====================
+    printf("\n======== F4：基于历史记录二次搜索 ========\n");
+    if(count == 0)
+    {
+        printf("无历史记录，无法执行F4查询\n");
+    }else{
+        int selectNo;
+        printf("请输入历史序号(1~%d)：",count);
+        scanf("%d",&selectNo);
+        getchar();
 
+        if(selectNo<1 || selectNo>count){
+            printf("输入序号超出范围！\n");
+        }else{
+            char oldKey[100];
+            strcpy(oldKey,historyStr[selectNo-1]);
+            printf("复用历史关键词【%s】重新检索\n",oldKey);
+
+            struct Node *f4Link = searchByKey(oldKey,f1List,n);
+            printf("F4二次检索结果：\n");
+            struct Node *fp = f4Link;
+            if(fp==NULL) printf("无匹配数据\n");
+            else{
+                while(fp){
+                    printf("[%s] %s\n",fp->type,fp->data);
+                    fp=fp->next;
+                }
+            }
+            freeLink(f4Link);
+        }
+    }
+
+    //释放全部链表
+    freeLink(head);
+    freeLink(filterHead);
+
+    return 0;
+}
