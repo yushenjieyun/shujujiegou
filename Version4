@@ -1,1 +1,62 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include<stdlib.h>
 
+// 结构体
+struct Node{
+    char data[100];    // 内容串
+    char type[20];     // 类型串
+    struct Node *next;
+};
+
+//全部小写转换
+void toLower(char *s){
+    int i;
+    for(i=0; s[i]!='\0'; i++){
+        s[i] = tolower(s[i]);
+    }
+}
+
+//通用搜索函数 F1 F4共用
+struct Node* searchByKey(char key[], char f1List[][100], int n)
+{
+    struct Node *head = NULL, *tail = NULL;
+    char keyLower[100];
+    strcpy(keyLower, key);
+    toLower(keyLower);
+
+    int i;
+    for(i=0; i<n; i++){
+        char temp[100];
+        strcpy(temp, f1List[i*2]);
+        toLower(temp);
+
+        if(strstr(temp, keyLower) != NULL){
+            struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+            strcpy(newNode->data, f1List[i*2]);
+            strcpy(newNode->type, f1List[i*2 + 1]);
+            newNode->next = NULL;
+
+            if(head == NULL){
+                head = newNode;
+                tail = newNode;
+            }else{
+                tail->next = newNode;
+                tail = newNode;
+            }
+        }
+    }
+    return head;
+}
+
+//链表统一释放函数
+void freeLink(struct Node *h)
+{
+    struct Node *p=h,*del;
+    while(p){
+        del=p;
+        p=p->next;
+        free(del);
+    }
+}
