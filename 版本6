@@ -1,4 +1,126 @@
-<!DOCTYPE html>
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#include <stdlib.h>
+#include <time.h>
+
+struct Node{
+    char data[100];
+    char type[20];
+    struct Node *next;
+};
+
+struct Favorite{
+    char data[100];
+    char type[20];
+};
+
+void toLower(char *s){
+    int i;
+    for(i=0; s[i]!='\0'; i++){
+        s[i] = tolower(s[i]);
+    }
+}
+
+struct Node* searchByKey(char key[], char f1List[][100], int n)
+{
+    struct Node *head = NULL, *tail = NULL;
+    char keyLower[100];
+    strcpy(keyLower, key);
+    toLower(keyLower);
+
+    int i;
+    for(i=0; i<n; i++){
+        char temp[100];
+        strcpy(temp, f1List[i*2]);
+        toLower(temp);
+
+        if(strstr(temp, keyLower) != NULL){
+            struct Node *newNode = (struct Node*)malloc(sizeof(struct Node));
+            if(newNode == NULL){
+                printf("内存分配失败！\n");
+                return head;
+            }
+            strcpy(newNode->data, f1List[i*2]);
+            strcpy(newNode->type, f1List[i*2 + 1]);
+            newNode->next = NULL;
+
+            if(head == NULL){
+                head = newNode;
+                tail = newNode;
+            }else{
+                tail->next = newNode;
+                tail = newNode;
+            }
+        }
+    }
+    return head;
+}
+
+void freeLink(struct Node *h)
+{
+    struct Node *p=h, *del;
+    while(p){
+        del=p;
+        p=p->next;
+        free(del);
+    }
+}
+
+void showMenu(){
+    printf("\n========== F1信息管理系统 ==========\n");
+    printf("1 - F1 关键词搜索\n");
+    printf("2 - F2 结果筛选\n");
+    printf("3 - F3 查看搜索历史\n");
+    printf("4 - F4 收藏结果\n");
+    printf("5 - F5 清除历史\n");
+    printf("6 - F6 导出搜索结果\n");
+    printf("0 - 退出系统\n");
+    printf("====================================\n");
+    printf("请选择功能：");
+}
+
+void showResultWithNumber(struct Node *head){
+    struct Node *p = head;
+    int num = 1;
+    if(p == NULL){
+        printf("暂无搜索结果\n");
+    }else{
+        while(p != NULL){
+            printf("%d. [%s] %s\n", num++, p->type, p->data);
+            p = p->next;
+        }
+    }
+}
+
+void showResult(struct Node *head){
+    struct Node *p = head;
+    int count = 0;
+    if(p == NULL){
+        printf("未找到相关 F1 信息\n");
+    }else{
+        while(p != NULL){
+            printf("[%s] %s\n", p->type, p->data);
+            p = p->next;
+            count++;
+        }
+        printf("共找到 %d 条结果\n", count);
+    }
+}
+
+void getCurrentTime(char *timeStr, int size){
+    time_t rawtime;
+    struct tm *timeinfo;
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(timeStr, size, "%Y-%m-%d %H:%M:%S", timeinfo);
+}
+
+void exportResult(struct Node *head, char keyword[], struct Favorite favorites[], int favCount){
+    if(head == NULL){
+        printf("\n暂无搜索结果可导出！请先进行F1关键词搜索。\n");
+        return;
+    }<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
